@@ -9,5 +9,5 @@ import warenautomat.SystemSoftware;
 public class Drehteller {
   
   // TODO
-  
+  // ... LocalDate ldate = SystemSoftware.gibAktuellesDatum();
 }
