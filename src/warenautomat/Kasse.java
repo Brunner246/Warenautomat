@@ -13,15 +13,29 @@ import warenautomat.SystemSoftware;
  * - 2 Franken <br>
  */
 public class Kasse {
+    public static final int ANZAHL_MUENZSAEULEN = 5;
+    public static final int[] MUENZ_TYPEN = {10, 20, 50, 100, 200};
+    private MuenzSaeule[] mMuenzsaeulen;
+    private int mGuthaben;
+    private int mWechselgeld;
+
+
 
   /**
    * Standard-Konstruktor. <br>
    * Führt die nötigen Initialisierungen durch.
    */
   public Kasse() {
-    
+    mMuenzsaeulenErstellen(100); // jeder muenzBestand wird mit 100 erstellt
     // TODO
     
+  }
+
+  private void mMuenzsaeulenErstellen(int aMuenzBestand){
+    this.mMuenzsaeulen = new MuenzSaeule[ANZAHL_MUENZSAEULEN];
+    for (int il = 0; il < ANZAHL_MUENZSAEULEN; il++){
+        this.mMuenzsaeulen[il] = new MuenzSaeule(aMuenzBestand, MUENZ_TYPEN[il]);
+    }
   }
 
   /**
@@ -44,6 +58,8 @@ public class Kasse {
    *         Wenn ein nicht unterstützter Münzbetrag übergeben wurde: -200
    */
   public int verwalteMuenzbestand(double pMuenzenBetrag, int pAnzahl) {
+    double lMuenzeInRappen = pMuenzenBetrag / 100.;
+
     
     return 0; // TODO
     
@@ -81,9 +97,35 @@ public class Kasse {
    *         <code> false </code>, wenn Münzsäule bereits voll war.
    */
   public boolean einnehmen(double pMuenzenBetrag) {
-    
-    return false; // TODO
-    
+    int lBetragRappen = MuenzKonverter.konvertiere(pMuenzenBetrag);
+    if (lBetragRappen % 10 == 0){
+        if (this.mMuenzsaeulen[0].neueMuenzen(lBetragRappen / 10)){
+            return true;
+        }
+    } 
+    else if (lBetragRappen % 20 == 0){
+        if(this.mMuenzsaeulen[1].neueMuenzen(lBetragRappen / 20)){
+            return true;
+        }
+    }
+    else if (lBetragRappen % 50 == 0){
+        if (this.mMuenzsaeulen[2].neueMuenzen(lBetragRappen / 50)){
+            return true;
+        }
+    }
+    else if (lBetragRappen % 100 == 0){
+        if (this.mMuenzsaeulen[3].neueMuenzen(lBetragRappen / 100)){
+            return true;
+        }
+    }
+    else if (lBetragRappen % 200 == 0){
+        if (this.mMuenzsaeulen[4].neueMuenzen(lBetragRappen / 200)){
+            return true;
+        }    
+    }
+
+        return false; // TODO
+        
   }
 
   /**

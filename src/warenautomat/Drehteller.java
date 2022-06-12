@@ -12,7 +12,7 @@ public class Drehteller {
   public Drehteller(){
     this.mFaecher = new Fach[ANZAHL_FAECHER];
     for (int il = 0; il < mFaecher.length; il++){
-      mFaecher[il] = new Fach();
+      this.mFaecher[il] = new Fach();
     }
   }
 
