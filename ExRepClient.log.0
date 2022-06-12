@@ -63,3 +63,15 @@ CliDmClientConfig   :FINER  :Loaded ranking data
 CliDmClientConfig   :FINER  :Loaded log module "client" with level "OFF"
 CliDmClientConfig   :FINER  :Loaded logging data
 CliDmClientConfig   :INFO   :XML client config file successfully saved
+ComPdCommandLinePars:INFO   :Logging to SysOut (console) enabled by command line argument
+ComPdCommandLinePars:INFO   :Logging to logfile enabled by command line argument
+ComPdCommandLinePars:INFO   :LogLevel set to FINER by command line argument
+CliPdUI             :INFO   :Timestamp: 20:01:53.867 - 12.06.2022
+CliPdUI             :INFO   :Starting ExRep-Client v3.0.0
+CliDmClientConfig   :INFO   :Loading client config from XML
+CliDmClientConfig   :FINER  :Loaded network data
+CliDmClientConfig   :FINER  :Loaded user data
+CliDmClientConfig   :FINER  :Loaded ranking data
+CliDmClientConfig   :FINER  :Loaded log module "client" with level "OFF"
+CliDmClientConfig   :FINER  :Loaded logging data
+CliDmClientConfig   :INFO   :XML client config file successfully saved

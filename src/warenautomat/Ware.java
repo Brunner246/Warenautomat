@@ -31,6 +31,7 @@ public class Ware {
         if (isHaltbarkeitUeberschritten() == false){
             return this.mPreis;
         }
+        System.out.println("Preis für reduzierte Ware");
         return this.mPreis - (int) (2 * Math.round((REDUKTIONS_FAKTOR * this.mPreis) / 2));
         
     }

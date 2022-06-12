@@ -97,7 +97,8 @@ public class Kasse {
    *         <code> false </code>, wenn Münzsäule bereits voll war.
    */
   public boolean einnehmen(double pMuenzenBetrag) {
-    int lBetragRappen = MuenzKonverter.konvertiere(pMuenzenBetrag);
+    int lBetragRappen = HelperClasses.konvertiere(pMuenzenBetrag);
+    
     if (lBetragRappen % 10 == 0){
         if (this.mMuenzsaeulen[0].neueMuenzen(lBetragRappen / 10)){
             return true;
@@ -125,8 +126,24 @@ public class Kasse {
     }
 
         return false; // TODO
-        
   }
+
+  // public void gibWechselGeld() {
+	// 	while (zurZeitEingenommen != 0) {
+	// 		if (genugGrossUndGenugMuenzen(200)) {
+	// 			gibMuenzeZurueck(200);
+	// 		} else if (genugGrossUndGenugMuenzen(100)) {
+	// 			gibMuenzeZurueck(100);
+	// 		} else if (genugGrossUndGenugMuenzen(50)) {
+	// 			gibMuenzeZurueck(50);
+	// 		} else if (genugGrossUndGenugMuenzen(20)) {
+	// 			gibMuenzeZurueck(20);
+	// 		} else if (genugGrossUndGenugMuenzen(10)) {
+	// 			gibMuenzeZurueck(10);
+	// 		}
+	// 	}
+	// 	SystemSoftware.zeigeBetragAn(0);
+	// }
 
   /**
    * Bewirkt den Auswurf des Restbetrages.

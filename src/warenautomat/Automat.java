@@ -21,7 +21,10 @@ public class Automat {
    * instanziert).
    */
   public Automat() {
-    
+    this.drehteller = new Drehteller[7];
+    for (int il = 0; il < NR_DREHTELLER; il++){
+      this.drehteller[il] = new Drehteller();
+    }
     // TODO 
     
   }
