@@ -8,12 +8,16 @@ public class Drehteller {
   private Fach[] mFaecher; // [16    -   0..1]
   private boolean mIstOffen;
   private int mFachNr;
+  private int mDrehtellerNr;
+  private Automat mAutomat;
   
-  public Drehteller(){
+  public Drehteller(int aDrehtellerNr, Automat aAutomat){
+    this.mAutomat = aAutomat;
     this.mFaecher = new Fach[ANZAHL_FAECHER];
     for (int il = 0; il < mFaecher.length; il++){
-      this.mFaecher[il] = new Fach();
+      this.mFaecher[il] = new Fach(this);
     }
+    this.mDrehtellerNr = aDrehtellerNr;
   }
 
   public void drehen(){
@@ -23,8 +27,13 @@ public class Drehteller {
     }
   }
 
+  public void setAktuellesFach(int aFachNr){
+    this.mFachNr = aFachNr;
+  }
+
   public Fach getAktuellesFach(){
-    return mFaecher[this.mFachNr];
+    int lFachNr = mFachNr--;
+    return mFaecher[lFachNr];
   }
 
   public void oeffnen(){
@@ -33,6 +42,11 @@ public class Drehteller {
       this.mIstOffen = true;
     }
     this.mIstOffen = false;
+  }
+
+  public void fuelleFach(Ware aWare){
+    getAktuellesFach().setWare(aWare);
+    aktualisiereAnzeige();
   }
 
   public void schliesseFach(){
@@ -44,6 +58,45 @@ public class Drehteller {
       this.mIstOffen = true;
     }
   }
+
+  public int getTotalWarenWert(){
+    int lWarenWert = 0;
+    for (Fach lFach: mFaecher){
+      if (!lFach.istLeer()){
+        lWarenWert+= lFach.getWare().getPreis();
+      }
+    }
+    return lWarenWert;
+  }
+
+  public void aktualisiereAnzeige(){
+    Ware lWare = getAktuellesFach().getWare();
+    if (getAktuellesFach().istLeer()){
+      SystemSoftware.zeigeWareInGui(this.mFachNr, null, null);
+      SystemSoftware.zeigeVerfallsDatum(this.mDrehtellerNr, 0);
+      return;
+    }
+    SystemSoftware.zeigeWareInGui(this.mFachNr, lWare.getName(), lWare.getDate());
+    if (lWare.isHaltbarkeitUeberschritten()){
+      SystemSoftware.zeigeVerfallsDatum(this.mDrehtellerNr, 2);
+      return;
+    }
+    SystemSoftware.zeigeVerfallsDatum(this.mDrehtellerNr, 1);
+    
+  }
+
+  public Automat getAutomat(){
+    return this.mAutomat;
+  }
+
+  // public int getIdentischeWare(String aName){
+  //   int lWarenWert = 0;
+  //   for (Fach lFach: mFaecher){
+  //     if (!lFach.istLeer() && aName.equals(lFach.getWare().getName())){
+  //       lWarenWert+= lFach.getWare().getPreis();
+  //     }
+  //   }
+  // }
 }
 
 

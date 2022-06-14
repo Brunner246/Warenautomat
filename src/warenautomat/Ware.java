@@ -11,6 +11,7 @@ public class Ware {
     private String mName;
     private int mPreis;
     private LocalDate mDate;
+    private Kauf mKauf;
     
     /** 
      * @param aName Name der Ware
@@ -41,12 +42,20 @@ public class Ware {
     }
 
     public boolean isHaltbarkeitUeberschritten(){
-        if (SystemSoftware.gibAktuellesDatum().isAfter(this.mDate)){
+        if (!SystemSoftware.gibAktuellesDatum().isAfter(this.mDate)){
             return true;
         }
         else{
             return false;
         }
+    }
+
+    public void setKauf(Kauf aKauf){
+        this.mKauf = aKauf;
+    }
+
+    public Kauf getKauf(){
+        return this.mKauf;
     }
 
     // public static void main(String[] args) {

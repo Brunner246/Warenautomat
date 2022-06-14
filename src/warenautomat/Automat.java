@@ -2,6 +2,7 @@ package warenautomat;
 
 import java.time.LocalDate;
 
+
 /**
  * Der Automat besteht aus 7 Drehtellern welche wiederum je aus 16 Fächer
  * bestehen. <br>
@@ -21,12 +22,11 @@ public class Automat {
    * instanziert).
    */
   public Automat() {
+		this.kasse = new Kasse();
     this.drehteller = new Drehteller[7];
     for (int il = 0; il < NR_DREHTELLER; il++){
-      this.drehteller[il] = new Drehteller();
+      this.drehteller[il] = new Drehteller(il++, this);
     }
-    // TODO 
-    
   }
 
   /**
@@ -45,11 +45,15 @@ public class Automat {
    * @param pPreis Der Preis der neuen Ware.
    * @param pVerfallsDatum Das Verfallsdatum der neuen Ware.
    */
-  public void neueWareVonBarcodeLeser(int pDrehtellerNr, String pWarenName, 
-                                      double pPreis, LocalDate pVerfallsDatum) {
-    
-    // TODO
-    
+  public void neueWareVonBarcodeLeser(int pDrehtellerNr, String pWarenName, double pPreis, LocalDate pVerfallsDatum) {
+    // prüfen, ob Fach leer ist
+    if (!this.getDrehteller(pDrehtellerNr).getAktuellesFach().istLeer()){
+      this.getDrehteller(pDrehtellerNr).getAktuellesFach().entferneWare();
+    }
+		int lPreis = HelperClasses.konvertiere(pPreis);
+    Ware lNeueWare = new Ware(pWarenName, lPreis, pVerfallsDatum);
+		Drehteller lDrehteller = getDrehteller(pDrehtellerNr);
+		lDrehteller.fuelleFach(lNeueWare);
   }
 
   /**
@@ -57,6 +61,11 @@ public class Automat {
    */
   public Kasse gibKasse() {
     return kasse;
+  }
+
+  public Drehteller getDrehteller(int aDrehtellerNr){
+    aDrehtellerNr --; // um eins reduzieren
+    return this.drehteller[aDrehtellerNr];
   }
 
   /**
@@ -70,9 +79,10 @@ public class Automat {
    * wenn ein Fach offen ist.
    */
   public void drehen() {
-    
-    // TODO
-    
+    SystemSoftware.dreheWarenInGui();
+		for (int il = 0; il < NR_DREHTELLER; il++){
+			getDrehteller(il++).drehen();
+		}
   }
 
   /**
