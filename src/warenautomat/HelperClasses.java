@@ -2,9 +2,13 @@ package warenautomat;
 
 class HelperClasses {
 
-    public static int konvertiere(double aMuenzbetrag){
+    public static int konvertiereInGanzzahl(double aMuenzbetrag){
         return (int) Math.round(aMuenzbetrag * 100);
     }    
+    public static double konvertiereInDouble(int aBetrag){
+        double lBetrag = aBetrag / 100.;
+        return  lBetrag;
+    }
 }
 
 class Muenztyp{

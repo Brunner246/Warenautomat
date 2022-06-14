@@ -34,10 +34,17 @@ public class MuenzSaeule {
             return false;
         }
         this.mZaehler += aAnzahlMuenzen;
-        this.mFreieKapazitaet = MAX_KAPAZITAET - this.mZaehler;
-        SystemSoftware.zeigeMuenzenInGui(this.mMuenzTyp/100, aAnzahlMuenzen);
-        System.out.println(aAnzahlMuenzen + "Münzen hinzugefügt");
+        // this.mZaehler += aAnzahlMuenzen;
+        // this.mFreieKapazitaet = MAX_KAPAZITAET - this.mZaehler;
+        // SystemSoftware.zeigeMuenzenInGui(this.mMuenzTyp/100, aAnzahlMuenzen);
+        // System.out.println(aAnzahlMuenzen + "Münzen hinzugefügt");
         return true;
+    }
+
+    public void neueMuenzenVerbuchen(){
+        // this.mFreieKapazitaet = MAX_KAPAZITAET - this.mZaehler;
+        this.mZaehler += this.mGuthaben;
+        SystemSoftware.zeigeMuenzenInGui(this.mMuenzTyp/100, this.mZaehler);
     }
 
     public void setGuthaben(int aGuthaben){
@@ -69,5 +76,9 @@ public class MuenzSaeule {
 
     public int getZaehler(){
         return this.mZaehler;
+    }
+
+    public int getFreieKapazitaet(){
+        return this.mFreieKapazitaet;
     }
 }

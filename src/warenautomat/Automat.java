@@ -25,7 +25,8 @@ public class Automat {
 		this.kasse = new Kasse();
     this.drehteller = new Drehteller[7];
     for (int il = 0; il < NR_DREHTELLER; il++){
-      this.drehteller[il] = new Drehteller(il++, this);
+			int lDrehtellerNr = il + 1;
+      this.drehteller[il] = new Drehteller(lDrehtellerNr, this);
     }
   }
 
@@ -46,14 +47,22 @@ public class Automat {
    * @param pVerfallsDatum Das Verfallsdatum der neuen Ware.
    */
   public void neueWareVonBarcodeLeser(int pDrehtellerNr, String pWarenName, double pPreis, LocalDate pVerfallsDatum) {
-    // prüfen, ob Fach leer ist
-    if (!this.getDrehteller(pDrehtellerNr).getAktuellesFach().istLeer()){
-      this.getDrehteller(pDrehtellerNr).getAktuellesFach().entferneWare();
-    }
-		int lPreis = HelperClasses.konvertiere(pPreis);
-    Ware lNeueWare = new Ware(pWarenName, lPreis, pVerfallsDatum);
+		SystemSoftware.zeigeWareInGui(pDrehtellerNr, pWarenName, pVerfallsDatum);
+		System.out.println(pPreis + "test");
+		
+
 		Drehteller lDrehteller = getDrehteller(pDrehtellerNr);
+		
+    // prüfen, ob Fach leer ist
+    if (this.getDrehteller(pDrehtellerNr).getAktuellesFach().istLeer()){
+			lDrehteller.setAktuellesFach(lDrehteller.getFachNr());
+
+    }
+		int lPreis = HelperClasses.konvertiereInGanzzahl(pPreis);
+    Ware lNeueWare = new Ware(pWarenName, lPreis, pVerfallsDatum);
+
 		lDrehteller.fuelleFach(lNeueWare);
+		return;
   }
 
   /**
@@ -81,8 +90,20 @@ public class Automat {
   public void drehen() {
     SystemSoftware.dreheWarenInGui();
 		for (int il = 0; il < NR_DREHTELLER; il++){
-			getDrehteller(il++).drehen();
+			int lDrehtellerNr = il + 1;
+			Drehteller lDrehteller = getDrehteller(lDrehtellerNr);
+			lDrehteller.drehen();
+			Ware lWare = lDrehteller.getAktuellesFach().getWare();
+			if (lWare == null){
+				SystemSoftware.zeigeWarenPreisAn(lDrehtellerNr, 0.);
+				SystemSoftware.zeigeVerfallsDatum(lDrehtellerNr, 0);
+			}
+			else{
+				SystemSoftware.zeigeWarenPreisAn(lDrehtellerNr, HelperClasses.konvertiereInDouble(lWare.getPreis()));
+				SystemSoftware.zeigeVerfallsDatum(lDrehtellerNr, lWare.getZustandDisplay());
+			}
 		}
+		
   }
 
   /**
@@ -108,8 +129,28 @@ public class Automat {
    *          Nummerierung beginnt mit 1 (nicht 0)!
    * @return Wenn alles o.k. <code> true </code>, sonst <code> false </code>.
    */
-  public boolean oeffnen(int pDrehtellerNr) {
-    
+  public boolean oeffnen(int aDrehtellerNr) {
+		Fach lFach = getDrehteller(aDrehtellerNr).getAktuellesFach();
+    if (lFach.istLeer()){
+			return false;
+		}
+		else if (lFach.getWare().isHaltbarkeitUeberschritten()){
+			SystemSoftware.zeigeVerfallsDatum(aDrehtellerNr, 2);
+			System.out.print("Preis wurde reduziert...\n");
+		}
+		/*
+		 * if (kasse.gibZurZeitEingenommen() < ware.getPrice()) {
+				SystemSoftware.zeigeZuWenigGeldAn();
+				return false;
+			}
+
+			if (!kasse.hatGenugWechselgeld(ware.getPrice())) {
+				SystemSoftware.zeigeZuWenigWechselGeldAn();
+				return false;
+			}
+		 */
+
+		System.out.println("code fehlt...");
     return false;  // TODO
     
   }

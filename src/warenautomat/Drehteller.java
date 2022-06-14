@@ -27,13 +27,17 @@ public class Drehteller {
     }
   }
 
+  public int getFachNr(){
+    return this.mFachNr;
+  }
+
   public void setAktuellesFach(int aFachNr){
     this.mFachNr = aFachNr;
   }
 
   public Fach getAktuellesFach(){
-    int lFachNr = mFachNr--;
-    return mFaecher[lFachNr];
+    // int lFachNr = mFachNr--;
+    return mFaecher[mFachNr];
   }
 
   public void oeffnen(){
@@ -72,11 +76,12 @@ public class Drehteller {
   public void aktualisiereAnzeige(){
     Ware lWare = getAktuellesFach().getWare();
     if (getAktuellesFach().istLeer()){
-      SystemSoftware.zeigeWareInGui(this.mFachNr, null, null);
+      //SystemSoftware.zeigeWareInGui(this.mFachNr, null, null);
+      System.out.println("ich bin leer");
       SystemSoftware.zeigeVerfallsDatum(this.mDrehtellerNr, 0);
       return;
     }
-    SystemSoftware.zeigeWareInGui(this.mFachNr, lWare.getName(), lWare.getDate());
+    //SystemSoftware.zeigeWareInGui(this.mFachNr, lWare.getName(), lWare.getDate());
     if (lWare.isHaltbarkeitUeberschritten()){
       SystemSoftware.zeigeVerfallsDatum(this.mDrehtellerNr, 2);
       return;

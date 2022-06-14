@@ -42,12 +42,19 @@ public class Ware {
     }
 
     public boolean isHaltbarkeitUeberschritten(){
-        if (!SystemSoftware.gibAktuellesDatum().isAfter(this.mDate)){
+        if (SystemSoftware.gibAktuellesDatum().isAfter(this.mDate)){
             return true;
         }
         else{
             return false;
         }
+    }
+
+    public int getZustandDisplay(){
+        if (!isHaltbarkeitUeberschritten()){
+            return 1;
+        }
+        return 2;
     }
 
     public void setKauf(Kauf aKauf){
