@@ -20,6 +20,7 @@ public class Kasse {
     private int mGuthabenKunde = 0;
     private int mWechselgeld = 0;
     private Automat mAutomat;
+    private int mPreisTotalVerkaufteWare = 0;
 
 
 
@@ -28,7 +29,7 @@ public class Kasse {
    * Führt die nötigen Initialisierungen durch.
    */
   public Kasse(Automat aAutomat) {
-    mMuenzsaeulenErstellen(5);
+    mMuenzsaeulenErstellen(2);
     this.mAutomat = aAutomat;
   }
 
@@ -76,19 +77,22 @@ public class Kasse {
       }
       for (int il = 0; il < MUENZ_TYPEN.length; il++){
         if (MUENZ_TYPEN[il] == lMuenzBetrag){
+          if (aAnzahl >= 0){
           if (mMuenzsaeulen[il].freierPlatz() > 0){
-            if (aAnzahl <= mMuenzsaeulen[il].freierPlatz()){
-              mMuenzsaeulen[il].neueMuenzen(aAnzahl);
-              return aAnzahl;
+            
+              if (aAnzahl <= mMuenzsaeulen[il].freierPlatz()){
+                mMuenzsaeulen[il].neueMuenzen(aAnzahl, true);
+                return aAnzahl;
+              }
             }
+          }
             else{
-              aAnzahl -= mMuenzsaeulen[il].freierPlatz();
-              mMuenzsaeulen[il].neueMuenzen(aAnzahl);
+              // aAnzahl -= mMuenzsaeulen[il].freierPlatz();
+              mMuenzsaeulen[il].neueMuenzen(aAnzahl, true);
               return aAnzahl;
             }
           }
         }
-      }
       System.out.println("kein Platz vorhanden");
     return 0;
   }
@@ -127,10 +131,11 @@ public class Kasse {
     for (int il = 0; il < MUENZ_TYPEN.length; il++){
       if (MUENZ_TYPEN[il] == lBetragRappen){
         if (mMuenzsaeulen[il].freierPlatz() <= 0){
+          System.out.println("Service Techniker aufbieten um Münzsäulen zu leeren");
           SystemSoftware.auswerfenWechselGeld(pMuenzenBetrag);
           return false;
         }
-        mMuenzsaeulen[il].neueMuenzen(1);
+        mMuenzsaeulen[il].neueMuenzen(1, false);
       }
     }
     this.mGuthabenKunde += lBetragRappen;
@@ -183,6 +188,7 @@ public class Kasse {
 
   public void kaufAusfuehren(Ware aWare){
     this.mGuthabenKunde -= aWare.getPreis();
+    this.mPreisTotalVerkaufteWare += aWare.getPreis();
     SystemSoftware.zeigeBetragAn(HelperClasses.konvertiereInDouble(this.mGuthabenKunde));
   }
 
@@ -193,7 +199,6 @@ public class Kasse {
    * @return Gesamtbetrag der bisher verkauften Waren.
    */
   public double gibBetragVerkaufteWaren() {
-    
-    return 0.0; // TODO
+    return HelperClasses.konvertiereInDouble( this.mPreisTotalVerkaufteWare);
   }
 }

@@ -64,65 +64,21 @@ public class Drehteller {
   }
 
   public int getTotalWarenWert(){
-    int lWarenWert = 0;
-    for (Fach lFach: mFaecher){
+    int lTotalerWarenWert = 0;
+    for (Fach lFach : mFaecher){
       if (!lFach.istLeer()){
-        lWarenWert+= lFach.getWare().getPreis();
+        lTotalerWarenWert += lFach.getWare().getPreis();
       }
     }
-    return lWarenWert;
+    return lTotalerWarenWert;
   }
 
   public void aktualisiereAnzeige(){
     Ware lWare = getAktuellesFach().getWare();
-    if (getAktuellesFach().istLeer()){
-      //SystemSoftware.zeigeWareInGui(this.mFachNr, null, null);
-      System.out.println("ich bin leer");
-      SystemSoftware.zeigeVerfallsDatum(this.mDrehtellerNr, 0);
-      return;
-    }
-    //SystemSoftware.zeigeWareInGui(this.mFachNr, lWare.getName(), lWare.getDate());
-    if (lWare.isHaltbarkeitUeberschritten()){
-      SystemSoftware.zeigeVerfallsDatum(this.mDrehtellerNr, 2);
-      return;
-    }
-    SystemSoftware.zeigeVerfallsDatum(this.mDrehtellerNr, 1);
-    
+    SystemSoftware.zeigeVerfallsDatum(this.mDrehtellerNr, lWare.getZustandDisplay());    
   }
 
   public Automat getAutomat(){
     return this.mAutomat;
   }
-
-  // public int getIdentischeWare(String aName){
-  //   int lWarenWert = 0;
-  //   for (Fach lFach: mFaecher){
-  //     if (!lFach.istLeer() && aName.equals(lFach.getWare().getName())){
-  //       lWarenWert+= lFach.getWare().getPreis();
-  //     }
-  //   }
-  // }
 }
-
-
-/*
- * public int gibTotalenWarenWert() {
-		int wert = 0;
-		for (Fach fach : mFach) {
-			if (fach.istWareImFach()) {
-				wert += fach.getWare().getPrice();
-			}
-		}
-		return wert;
-	}
-
-	public int gibWarenMenge(String warenName) {
-		int menge = 0;
-		for (Fach fach : mFach) {
-			if ((fach.istWareImFach()) && (warenName.equals(fach.getWare().getName())) && !fach.getWare().istAbgelaufen()) {
-				menge += 1;
-			}
-		}
-		return menge;
-	}
- */

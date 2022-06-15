@@ -1,6 +1,7 @@
 package warenautomat;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 
 /**
@@ -15,8 +16,8 @@ public class Automat {
   private static final int NR_DREHTELLER = 7;
   private Drehteller[] drehteller;
   private Kasse kasse;
-  private boolean mKaufAusgefuehrt = false;
-
+  private ArrayList<Kauf> mVerkaufteWare = new ArrayList<Kauf>();
+  private double mTotalerWarenWert = 0.;
   /**
    * Der Standard-Konstruktor. <br>
    * Führt die nötigen Initialisierungen durch (u.a. wird darin die Kasse
@@ -48,7 +49,7 @@ public class Automat {
    * @param pVerfallsDatum Das Verfallsdatum der neuen Ware.
    */
   public void neueWareVonBarcodeLeser(int pDrehtellerNr, String pWarenName, double pPreis, LocalDate pVerfallsDatum) {
-		SystemSoftware.zeigeWareInGui(pDrehtellerNr, pWarenName, pVerfallsDatum);
+		SystemSoftware.zeigeWarenPreisAn(pDrehtellerNr, pPreis);
 		Drehteller lDrehteller = getDrehteller(pDrehtellerNr);
     // prüfen, ob Fach leer ist
     if (this.getDrehteller(pDrehtellerNr).getAktuellesFach().istLeer()){
@@ -56,8 +57,10 @@ public class Automat {
     }
 		int lPreis = HelperClasses.konvertiereInGanzzahl(pPreis);
     Ware lNeueWare = new Ware(pWarenName, lPreis, pVerfallsDatum);
-
+    SystemSoftware.zeigeWareInGui(pDrehtellerNr, pWarenName, pVerfallsDatum);
 		lDrehteller.fuelleFach(lNeueWare);
+    lPreis = lNeueWare.getPreis();
+    mTotalerWarenWert += HelperClasses.konvertiereInDouble(lPreis);
     kasse.anzeigenSetzen(); // zeige Display
 		return;
   }
@@ -145,16 +148,17 @@ public class Automat {
     if (lRueckGeld > 0){
       if (!pruefeRueckGeldMenge(lRueckGeld)){
         SystemSoftware.zeigeZuWenigWechselGeldAn();
+        return false;
       }
-
     }
     kasse.kaufAusfuehren(lFach.getWare());
+    Kauf lKauf = new Kauf(lFach.getWare());
+    mVerkaufteWare.add(lKauf);
     SystemSoftware.entriegeln(aDrehtellerNr);
     lFach.setWare(null);
     SystemSoftware.zeigeVerfallsDatum(aDrehtellerNr, 0);
 
     return true; 
-    
   }
 
   private boolean pruefeRueckGeldMenge(int aRueckgeld){
@@ -183,27 +187,27 @@ public class Automat {
         }
       while (aRueckgeld != 0){
         if (aRueckgeld >= 200 && linMuenzSaeule200 != 0){
-          kasse.getMuenzSaeule(4).neueMuenzen(-1);
+          kasse.getMuenzSaeule(4).neueMuenzen(-1, false);
           aRueckgeld -= 200;
           SystemSoftware.auswerfenWechselGeld(2.00);
         }
         else if (aRueckgeld >= 100 && linMuenzSaeule100 != 0){
-          kasse.getMuenzSaeule(3).neueMuenzen(-1);
+          kasse.getMuenzSaeule(3).neueMuenzen(-1, false);
           aRueckgeld -= 100;
           SystemSoftware.auswerfenWechselGeld(1.00);
         }
         else if (aRueckgeld >= 50 && linMuenzSaeule50 != 0){
-          kasse.getMuenzSaeule(2).neueMuenzen(-1);
+          kasse.getMuenzSaeule(2).neueMuenzen(-1, false);
           aRueckgeld -= 50;
           SystemSoftware.auswerfenWechselGeld(0.50);
         }
         else if (aRueckgeld >= 20 && linMuenzSaeule20 != 0){
-          kasse.getMuenzSaeule(1).neueMuenzen(-1);
+          kasse.getMuenzSaeule(1).neueMuenzen(-1, false);
           aRueckgeld -= 20;
           SystemSoftware.auswerfenWechselGeld(0.20);
         }
         else if (aRueckgeld >= 10 && linMuenzSaeule10 != 0){
-          kasse.getMuenzSaeule(0).neueMuenzen(-1);
+          kasse.getMuenzSaeule(0).neueMuenzen(-1, false);
           aRueckgeld -= 10;
           SystemSoftware.auswerfenWechselGeld(0.10);
         }
@@ -223,8 +227,7 @@ public class Automat {
    * @return Der totale Warenwert des Automaten.
    */
   public double gibTotalenWarenWert() {
-    
-    return 0.0; // TODO
+    return mTotalerWarenWert; 
     
   }
 
@@ -237,9 +240,14 @@ public class Automat {
    * @return Anzahl verkaufter Waren.
    */
   public int gibVerkaufsStatistik(String pName, LocalDate pDatum) {
-    
-    return 0; // TODO
-    
+    int lCounter = 0; //TODO
+    for (int il = 0; il < mVerkaufteWare.size(); il++){
+      Kauf lK = mVerkaufteWare.get(il);
+      if (lK.getDate().isAfter(pDatum) && lK.getWare().getName().equals(pName)){
+        lCounter++;
+      }
+    }
+    return lCounter; 
   }
   
 }

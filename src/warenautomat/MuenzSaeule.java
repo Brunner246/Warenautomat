@@ -1,7 +1,7 @@
 package warenautomat;
 
 public class MuenzSaeule {
-    private static final int MAX_KAPAZITAET = 100;
+    private static final int MAX_KAPAZITAET = 101;
     private int mMuenzTyp = 0;
     private int mZaehler = 0; // vorhandener Münzbestand
     private int mZaehlerRueckgeld = 0;
@@ -12,15 +12,6 @@ public class MuenzSaeule {
         this.mZaehler = lMuenzBestand;
         this.mKasse = aKasse;
     }
-
-    // public void setzeMuenzBetrag(int aBetrag){
-    //     if ((MAX_KAPAZITAET - this.mZaehler) >= aBetrag){
-    //         this.mZaehler += aBetrag;
-    //     }
-    //     else{
-    //         System.out.println("Münzsaule ist voll");
-    //     }
-    // }
 
     public void neueMuenzenHinzufügen(){
         double lMuenzTyp = HelperClasses.konvertiereInDouble(this.mMuenzTyp);
@@ -46,8 +37,10 @@ public class MuenzSaeule {
         
         if (this.mZaehler > 0){
             // this.mZaehler --;
-            SystemSoftware.zeigeMuenzenInGui(lMuenzTyp, this.mZaehler);
+            
             this.mZaehlerRueckgeld --;
+            this.mZaehler --;
+            SystemSoftware.zeigeMuenzenInGui(lMuenzTyp, this.mZaehler);
         }
         return this.mZaehlerRueckgeld;
     }
@@ -56,10 +49,13 @@ public class MuenzSaeule {
         return this.mZaehler * this.mMuenzTyp;
     }
 
-    public boolean neueMuenzen(int aAnzahlMuenzen){
+    public boolean neueMuenzen(int aAnzahlMuenzen, boolean aServiceMode){
         if (aAnzahlMuenzen < 0){
             if (this.mZaehler > 0){
-                this.mZaehler -= 1;
+                if (aServiceMode){
+                    this.mZaehler --; 
+                }
+                neueMuenzenHinzufügen();
                 if (this.mZaehler < 0){
                     this.mZaehler = 0;
                 }
@@ -72,7 +68,7 @@ public class MuenzSaeule {
             return false;
         }
         this.mZaehler += aAnzahlMuenzen;
-        this.mZaehlerRueckgeld += this.mZaehler;
+        this.mZaehlerRueckgeld += aAnzahlMuenzen;
         neueMuenzenHinzufügen();
         return true;
     }

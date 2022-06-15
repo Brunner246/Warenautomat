@@ -1,10 +1,11 @@
 package warenautomat;
+import java.lang.ProcessBuilder.Redirect;
 import java.time.LocalDate;
 // import java.util.Date;
 import java.time.format.DateTimeFormatter;
 
 public class Ware {
-    public static final double REDUKTIONS_FAKTOR = 0.2; // TODO check reduction factor !!
+    public static final double REDUKTIONS_FAKTOR = 1.; // TODO check reduction factor !!
     public static final double RUNDUNGS_GENAUIGKEIT = 2;
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
@@ -33,7 +34,9 @@ public class Ware {
             return this.mPreis;
         }
         System.out.println("Preis für reduzierte Ware");
-        return this.mPreis - (int) (2 * Math.round((REDUKTIONS_FAKTOR * this.mPreis) / 2));
+        double lReduktion = HelperClasses.konvertiereInDouble(this.mPreis);
+        lReduktion *= REDUKTIONS_FAKTOR;
+        return HelperClasses.konvertiereInGanzzahl(lReduktion);
         
     }
 
@@ -54,7 +57,10 @@ public class Ware {
         if (!isHaltbarkeitUeberschritten()){
             return 1;
         }
-        return 2;
+        else if (isHaltbarkeitUeberschritten()){
+            return 2;
+        }
+    return 0;
     }
 
     public void setKauf(Kauf aKauf){

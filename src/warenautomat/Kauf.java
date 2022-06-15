@@ -8,7 +8,7 @@ public class Kauf {
     
     public Kauf(Ware aWare){
         this.mWare = aWare;
-        mDate = SystemSoftware.gibAktuellesDatum();
+        this.mDate = SystemSoftware.gibAktuellesDatum();
     }
 
     public Ware getWare(){
