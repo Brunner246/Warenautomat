@@ -22,8 +22,6 @@ public class Kasse {
     private Automat mAutomat;
     private int mPreisTotalVerkaufteWare = 0;
 
-
-
   /**
    * Standard-Konstruktor. <br>
    * Führt die nötigen Initialisierungen durch.

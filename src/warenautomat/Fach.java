@@ -1,5 +1,4 @@
 package warenautomat;
-// import java.time.LocalDate;
 
 public class Fach {
     

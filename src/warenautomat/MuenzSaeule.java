@@ -2,8 +2,9 @@ package warenautomat;
 
 public class MuenzSaeule {
     private static final int MAX_KAPAZITAET = 101;
+
     private int mMuenzTyp = 0;
-    private int mZaehler = 0; // vorhandener Münzbestand
+    private int mZaehler = 0;
     private int mZaehlerRueckgeld = 0;
     private Kasse mKasse;
 

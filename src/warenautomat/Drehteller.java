@@ -36,7 +36,6 @@ public class Drehteller {
   }
 
   public Fach getAktuellesFach(){
-    // int lFachNr = mFachNr--;
     return mFaecher[mFachNr];
   }
 
