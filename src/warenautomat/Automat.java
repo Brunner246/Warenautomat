@@ -15,6 +15,7 @@ public class Automat {
   private static final int NR_DREHTELLER = 7;
   private Drehteller[] drehteller;
   private Kasse kasse;
+  private boolean mKaufAusgefuehrt = false;
 
   /**
    * Der Standard-Konstruktor. <br>
@@ -22,7 +23,7 @@ public class Automat {
    * instanziert).
    */
   public Automat() {
-		this.kasse = new Kasse();
+		this.kasse = new Kasse(this);
     this.drehteller = new Drehteller[7];
     for (int il = 0; il < NR_DREHTELLER; il++){
 			int lDrehtellerNr = il + 1;
@@ -48,20 +49,16 @@ public class Automat {
    */
   public void neueWareVonBarcodeLeser(int pDrehtellerNr, String pWarenName, double pPreis, LocalDate pVerfallsDatum) {
 		SystemSoftware.zeigeWareInGui(pDrehtellerNr, pWarenName, pVerfallsDatum);
-		System.out.println(pPreis + "test");
-		
-
 		Drehteller lDrehteller = getDrehteller(pDrehtellerNr);
-		
     // prüfen, ob Fach leer ist
     if (this.getDrehteller(pDrehtellerNr).getAktuellesFach().istLeer()){
 			lDrehteller.setAktuellesFach(lDrehteller.getFachNr());
-
     }
 		int lPreis = HelperClasses.konvertiereInGanzzahl(pPreis);
     Ware lNeueWare = new Ware(pWarenName, lPreis, pVerfallsDatum);
 
 		lDrehteller.fuelleFach(lNeueWare);
+    kasse.anzeigenSetzen(); // zeige Display
 		return;
   }
 
@@ -101,9 +98,11 @@ public class Automat {
 			else{
 				SystemSoftware.zeigeWarenPreisAn(lDrehtellerNr, HelperClasses.konvertiereInDouble(lWare.getPreis()));
 				SystemSoftware.zeigeVerfallsDatum(lDrehtellerNr, lWare.getZustandDisplay());
+        if (lWare.getPreis() > kasse.getGuthabenKunde()){
+          SystemSoftware.zeigeZuWenigGeldAn();
+        }
 			}
 		}
-		
   }
 
   /**
@@ -138,21 +137,81 @@ public class Automat {
 			SystemSoftware.zeigeVerfallsDatum(aDrehtellerNr, 2);
 			System.out.print("Preis wurde reduziert...\n");
 		}
-		/*
-		 * if (kasse.gibZurZeitEingenommen() < ware.getPrice()) {
-				SystemSoftware.zeigeZuWenigGeldAn();
-				return false;
-			}
+    if (kasse.getGuthabenKunde() < lFach.getWare().getPreis()){
+      SystemSoftware.zeigeZuWenigGeldAn();
+      return false;
+    }
+    int lRueckGeld = (kasse.getGuthabenKunde() - lFach.getWare().getPreis());
+    if (lRueckGeld > 0){
+      if (!pruefeRueckGeldMenge(lRueckGeld)){
+        SystemSoftware.zeigeZuWenigWechselGeldAn();
+      }
 
-			if (!kasse.hatGenugWechselgeld(ware.getPrice())) {
-				SystemSoftware.zeigeZuWenigWechselGeldAn();
-				return false;
-			}
-		 */
+    }
+    kasse.kaufAusfuehren(lFach.getWare());
+    SystemSoftware.entriegeln(aDrehtellerNr);
+    lFach.setWare(null);
+    SystemSoftware.zeigeVerfallsDatum(aDrehtellerNr, 0);
 
-		System.out.println("code fehlt...");
-    return false;  // TODO
+    return true; 
     
+  }
+
+  private boolean pruefeRueckGeldMenge(int aRueckgeld){
+      int linMuenzSaeule10 = 0;
+      int linMuenzSaeule20 = 0;
+      int linMuenzSaeule50 = 0;
+      int linMuenzSaeule100 = 0;
+      int linMuenzSaeule200 = 0;
+      for (int il = 0; il < Kasse.ANZAHL_MUENZSAEULEN; il++){
+        if (kasse.getMuenzSaeule(il).getMuenzTyp() == 10){
+          linMuenzSaeule10 += kasse.getMuenzSaeule(il).getAnzahlMuenzen() * kasse.getMuenzSaeule(il).getMuenzTyp();
+        }
+        else if (kasse.getMuenzSaeule(il).getMuenzTyp() == 20){
+          linMuenzSaeule20 += kasse.getMuenzSaeule(il).getAnzahlMuenzen() * kasse.getMuenzSaeule(il).getMuenzTyp();
+        }
+        else if (kasse.getMuenzSaeule(il).getMuenzTyp() == 50){
+          linMuenzSaeule50 += kasse.getMuenzSaeule(il).getAnzahlMuenzen() * kasse.getMuenzSaeule(il).getMuenzTyp();
+        }
+        else if (kasse.getMuenzSaeule(il).getMuenzTyp() == 100){
+          linMuenzSaeule100 += kasse.getMuenzSaeule(il).getAnzahlMuenzen() * kasse.getMuenzSaeule(il).getMuenzTyp();
+        }
+        else if (kasse.getMuenzSaeule(il).getMuenzTyp() == 200){
+          linMuenzSaeule200 += kasse.getMuenzSaeule(il).getAnzahlMuenzen() * kasse.getMuenzSaeule(il).getMuenzTyp();
+        }
+       
+        }
+      while (aRueckgeld != 0){
+        if (aRueckgeld >= 200 && linMuenzSaeule200 != 0){
+          kasse.getMuenzSaeule(4).neueMuenzen(-1);
+          aRueckgeld -= 200;
+          SystemSoftware.auswerfenWechselGeld(2.00);
+        }
+        else if (aRueckgeld >= 100 && linMuenzSaeule100 != 0){
+          kasse.getMuenzSaeule(3).neueMuenzen(-1);
+          aRueckgeld -= 100;
+          SystemSoftware.auswerfenWechselGeld(1.00);
+        }
+        else if (aRueckgeld >= 50 && linMuenzSaeule50 != 0){
+          kasse.getMuenzSaeule(2).neueMuenzen(-1);
+          aRueckgeld -= 50;
+          SystemSoftware.auswerfenWechselGeld(0.50);
+        }
+        else if (aRueckgeld >= 20 && linMuenzSaeule20 != 0){
+          kasse.getMuenzSaeule(1).neueMuenzen(-1);
+          aRueckgeld -= 20;
+          SystemSoftware.auswerfenWechselGeld(0.20);
+        }
+        else if (aRueckgeld >= 10 && linMuenzSaeule10 != 0){
+          kasse.getMuenzSaeule(0).neueMuenzen(-1);
+          aRueckgeld -= 10;
+          SystemSoftware.auswerfenWechselGeld(0.10);
+        }
+        else{
+          return false;
+        }
+    }     
+    return true;
   }
 
   /**

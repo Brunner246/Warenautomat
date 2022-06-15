@@ -17,8 +17,9 @@ public class Kasse {
     public static final int[] MUENZ_TYPEN = {10, 20, 50, 100, 200};
     private MuenzSaeule[] mMuenzsaeulen;
     private int mIndexAktuelleMuenzsaeule;
-    private int mGuthaben;
-    private int mWechselgeld;
+    private int mGuthabenKunde = 0;
+    private int mWechselgeld = 0;
+    private Automat mAutomat;
 
 
 
@@ -26,17 +27,21 @@ public class Kasse {
    * Standard-Konstruktor. <br>
    * Führt die nötigen Initialisierungen durch.
    */
-  public Kasse() {
-    mMuenzsaeulenErstellen(100); // jeder muenzBestand wird mit 100 erstellt
-    // TODO
-    
+  public Kasse(Automat aAutomat) {
+    mMuenzsaeulenErstellen(5);
+    this.mAutomat = aAutomat;
   }
 
   private void mMuenzsaeulenErstellen(int aMuenzBestand){
     this.mMuenzsaeulen = new MuenzSaeule[ANZAHL_MUENZSAEULEN];
     for (int il = 0; il < ANZAHL_MUENZSAEULEN; il++){
-        this.mMuenzsaeulen[il] = new MuenzSaeule(aMuenzBestand, MUENZ_TYPEN[il]);
-        // SystemSoftware.zeigeMuenzenInGui(MUENZ_TYPEN[il] / 100., aMuenzBestand);
+        this.mMuenzsaeulen[il] = new MuenzSaeule(aMuenzBestand, MUENZ_TYPEN[il], this);
+    }
+  }
+
+  public void anzeigenSetzen(){
+    for (int il = 0; il < ANZAHL_MUENZSAEULEN; il++){
+        this.mMuenzsaeulen[il].neueMuenzenHinzufügen();
     }
   }
 
@@ -69,16 +74,23 @@ public class Kasse {
       if (!lVal){
         return -200;
       }
-    if (einnehmen(aMuenzenBetrag)){
-      SystemSoftware.zeigeMuenzenInGui(aMuenzenBetrag, this.mMuenzsaeulen[0].getZaehler());
-      return aAnzahl;
-    }
-    else if (!einnehmen(aMuenzenBetrag)){
-      return this.mMuenzsaeulen[this.mIndexAktuelleMuenzsaeule].getFreieKapazitaet();
-    }
-    else{
-      return 0;
-    }
+      for (int il = 0; il < MUENZ_TYPEN.length; il++){
+        if (MUENZ_TYPEN[il] == lMuenzBetrag){
+          if (mMuenzsaeulen[il].freierPlatz() > 0){
+            if (aAnzahl <= mMuenzsaeulen[il].freierPlatz()){
+              mMuenzsaeulen[il].neueMuenzen(aAnzahl);
+              return aAnzahl;
+            }
+            else{
+              aAnzahl -= mMuenzsaeulen[il].freierPlatz();
+              mMuenzsaeulen[il].neueMuenzen(aAnzahl);
+              return aAnzahl;
+            }
+          }
+        }
+      }
+      System.out.println("kein Platz vorhanden");
+    return 0;
   }
 
   /**
@@ -89,9 +101,9 @@ public class Kasse {
    * <code>verwalteMuenzbestand()</code>.
    */
   public void verwalteMuenzbestandBestaetigung() {
-    this.mMuenzsaeulen[this.mIndexAktuelleMuenzsaeule].neueMuenzenVerbuchen();
+    this.mMuenzsaeulen[this.mIndexAktuelleMuenzsaeule].neueMuenzenHinzufügen();
   }
- 
+ 
   /**
    * Diese Methode wird aufgerufen wenn ein Kunde eine Münze eingeworfen hat. <br>
    * Führt den eingenommenen Betrag entsprechend nach. <br>
@@ -112,75 +124,66 @@ public class Kasse {
    */
   public boolean einnehmen(double pMuenzenBetrag) {
     int lBetragRappen = HelperClasses.konvertiereInGanzzahl(pMuenzenBetrag);
-    
-    if (lBetragRappen % 10 == 0){
-        if (this.mMuenzsaeulen[0].neueMuenzen(lBetragRappen / 10)){
-          // SystemSoftware.zeigeMuenzenInGui(pMuenzenBetrag, this.mMuenzsaeulen[0].getZaehler());
-          this.mIndexAktuelleMuenzsaeule = 0;
-          this.mGuthaben += lBetragRappen;
-          this.mWechselgeld += this.mGuthaben;
-          SystemSoftware.zeigeBetragAn(this.mGuthaben / 100.);
-          return true;
+    for (int il = 0; il < MUENZ_TYPEN.length; il++){
+      if (MUENZ_TYPEN[il] == lBetragRappen){
+        if (mMuenzsaeulen[il].freierPlatz() <= 0){
+          SystemSoftware.auswerfenWechselGeld(pMuenzenBetrag);
+          return false;
         }
-    } 
-    else if (lBetragRappen % 20 == 0){
-        if(this.mMuenzsaeulen[1].neueMuenzen(lBetragRappen / 20)){
-          this.mIndexAktuelleMuenzsaeule = 1;
-          this.mGuthaben += lBetragRappen;
-          this.mWechselgeld += this.mGuthaben;
-          SystemSoftware.zeigeBetragAn(this.mGuthaben / 100.);
-          return true;
-        }
+        mMuenzsaeulen[il].neueMuenzen(1);
+      }
     }
-    else if (lBetragRappen % 50 == 0){
-        if (this.mMuenzsaeulen[2].neueMuenzen(lBetragRappen / 50)){
-          this.mIndexAktuelleMuenzsaeule = 2;
-          this.mGuthaben += lBetragRappen;
-          this.mWechselgeld += this.mGuthaben;
-          SystemSoftware.zeigeBetragAn(this.mGuthaben / 100.);
-          return true;
-        }
-    }
-    else if (lBetragRappen % 100 == 0){
-        if (this.mMuenzsaeulen[3].neueMuenzen(lBetragRappen / 100)){
-          this.mIndexAktuelleMuenzsaeule = 3;
-          this.mGuthaben += lBetragRappen;
-          this.mWechselgeld += this.mGuthaben;
-          SystemSoftware.zeigeBetragAn(this.mGuthaben / 100.);
-          return true;
-        }
-    }
-    else if (lBetragRappen % 200 == 0){
-        if (this.mMuenzsaeulen[4].neueMuenzen(lBetragRappen / 200)){
-          this.mIndexAktuelleMuenzsaeule = 4;
-          this.mGuthaben += lBetragRappen;
-          this.mWechselgeld += this.mGuthaben;
-          SystemSoftware.zeigeBetragAn(this.mGuthaben / 100.);
-          return true;
-        }    
-    }
-        return false;
+    this.mGuthabenKunde += lBetragRappen;
+    this.mWechselgeld = this.mGuthabenKunde;
+    SystemSoftware.zeigeBetragAn(HelperClasses.konvertiereInDouble(this.mWechselgeld));
+    return true;
+  }
+
+  public MuenzSaeule getMuenzSaeule(int aIndex){
+    return mMuenzsaeulen[aIndex];
+  }
+
+  public int getGuthabenKunde(){
+    return this.mGuthabenKunde;
   }
 
   /**
    * Bewirkt den Auswurf des Restbetrages.
    */
   public void gibWechselGeld() {
-    SystemSoftware.auswerfenWechselGeld(HelperClasses.konvertiereInDouble(this.mWechselgeld));
-    // TODO
-    
+    SystemSoftware.auswerfenWechselGeld(HelperClasses.konvertiereInDouble(this.mGuthabenKunde));
+
+    while (this.mGuthabenKunde != 0){
+      if (this.mGuthabenKunde >= 200){
+        mMuenzsaeulen[4].getZaehlerRueckgeld();
+        this.mGuthabenKunde -= 200;
+      }
+      else if (this.mGuthabenKunde >= 100){
+        mMuenzsaeulen[3].getZaehlerRueckgeld();
+        this.mGuthabenKunde -= 100;
+      }
+      else if (this.mGuthabenKunde >= 50){
+        mMuenzsaeulen[2].getZaehlerRueckgeld();
+        this.mGuthabenKunde -= 50;
+      }
+      else if (this.mGuthabenKunde >= 20){
+        mMuenzsaeulen[1].getZaehlerRueckgeld();
+        this.mGuthabenKunde -= 20;
+      }
+      else if (this.mGuthabenKunde >= 10){
+        mMuenzsaeulen[0].getZaehlerRueckgeld();
+        this.mGuthabenKunde -= 10;
+      }
+      else{
+        return;
+      }
+    }
+    SystemSoftware.zeigeBetragAn(0.0);
   }
 
-  public boolean kaufAusfuehren(Ware aWare){
-    int lGeldwechsel =  this.mGuthaben - aWare.getPreis();
-    if (lGeldwechsel < 0){
-      System.out.println("zu wenig geld vorhanden !");
-      return false;
-    }
-    else{
-      this.mWechselgeld = lGeldwechsel;
-      return true;
-    }
+  public void kaufAusfuehren(Ware aWare){
+    this.mGuthabenKunde -= aWare.getPreis();
+    SystemSoftware.zeigeBetragAn(HelperClasses.konvertiereInDouble(this.mGuthabenKunde));
   }
 
   /**
@@ -192,7 +195,5 @@ public class Kasse {
   public double gibBetragVerkaufteWaren() {
     
     return 0.0; // TODO
-    
   }
-
 }
