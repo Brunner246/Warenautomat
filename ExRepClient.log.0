@@ -251,11 +251,6 @@ DynamicUploadWarenau:INFO   :Successfully uploaded all files needed for the exer
 DynamicUploadWarenau:INFO   :execute() from DynamicUpload class stopped
 CliPdUI             :INFO   :execute() of dynamic upload class returned successfully
 CliPdUI             :INFO   :lastAnswer.size(): 1
-CliPdUI             :INFO   :result: >210 Process UID "warenautomat.checkin" successfully executed in 1330ms<
-ComPdCommandLinePars:INFO   :Logging to SysOut (console) enabled by command line argument
-ComPdCommandLinePars:INFO   :Logging to logfile enabled by command line argument
-ComPdCommandLinePars:INFO   :LogLevel set to FINER by command line argument
-CliPdUI             :INFO   :Timestamp: 21:16:44.454 - 16.06.2022
 CliPdUI             :INFO   :Starting ExRep-Client v3.0.0
 CliDmClientConfig   :INFO   :Loading client config from XML
 CliDmClientConfig   :FINER  :Loaded network data
@@ -280,4 +275,4 @@ DynamicUploadWarenau:INFO   :Successfully uploaded all files needed for the exer
 DynamicUploadWarenau:INFO   :execute() from DynamicUpload class stopped
 CliPdUI             :INFO   :execute() of dynamic upload class returned successfully
 CliPdUI             :INFO   :lastAnswer.size(): 1
-CliPdUI             :INFO   :result: >210 Process UID "warenautomat.checkin" successfully executed in 1466ms<
+

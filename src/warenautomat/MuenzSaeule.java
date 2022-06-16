@@ -15,8 +15,8 @@ public class MuenzSaeule {
     }
 
     public void neueMuenzenHinzufügen(){
-        double lMuenzTyp = HelperClasses.konvertiereInDouble(this.mMuenzTyp);
-        SystemSoftware.zeigeMuenzenInGui(lMuenzTyp, this.mZaehler); // HelperClasses.konvertiereInDouble(this.mMuenzTyp * this.mZaehler)
+        double lMuenzTyp = UnitKonverter.konvertiereInDouble(this.mMuenzTyp);
+        SystemSoftware.zeigeMuenzenInGui(lMuenzTyp, this.mZaehler);
     }
 
     public void auswerfen(int aAnzahl){
@@ -34,7 +34,7 @@ public class MuenzSaeule {
     }
 
     public int getZaehlerRueckgeld(){
-        double lMuenzTyp = HelperClasses.konvertiereInDouble(this.mMuenzTyp);
+        double lMuenzTyp = UnitKonverter.konvertiereInDouble(this.mMuenzTyp);
         
         if (this.mZaehler > 0){
             // this.mZaehler --;
@@ -61,7 +61,6 @@ public class MuenzSaeule {
                     this.mZaehler = 0;
                 }
             }
-            //throw new RuntimeException("negative Anzahl Münzen ist nicht erlaubt");
             return false;
         }
         if ((MAX_KAPAZITAET - this.mZaehler) <= aAnzahlMuenzen){
@@ -76,5 +75,9 @@ public class MuenzSaeule {
 
     public int freierPlatz(){
         return MAX_KAPAZITAET - this.mZaehler;
+    }
+
+    public Kasse getKasse(){
+        return this.mKasse;
     }
 }
