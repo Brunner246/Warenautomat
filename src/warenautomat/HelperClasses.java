@@ -14,12 +14,12 @@ class HelperClasses {
       }
 }
 
-class Muenztyp{
-    public static enum Muenzen {
-        MUENZE_10,
-        MUENZE_20,
-        MUENZE_50,
-        MUENZE_100,
-        MUENZE_200,
-    }
-}
+// class Muenztyp{
+//     public static enum Muenzen {
+//         MUENZE_10,
+//         MUENZE_20,
+//         MUENZE_50,
+//         MUENZE_100,
+//         MUENZE_200,
+//     }
+// }

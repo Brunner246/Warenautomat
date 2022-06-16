@@ -1,7 +1,7 @@
 package warenautomat;
 
 import java.util.Arrays;
-import warenautomat.SystemSoftware;
+// import warenautomat.SystemSoftware;
 
 /**
  * Die Kasse verwaltet das eingenommene Geld sowie das Wechselgeld. <br>
@@ -148,6 +148,10 @@ public class Kasse {
 
   public int getGuthabenKunde(){
     return this.mGuthabenKunde;
+  }
+
+  public Automat getAutomat(){
+    return this.mAutomat;
   }
 
   /**

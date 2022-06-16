@@ -3,8 +3,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class Ware {
-    public static final double REDUKTIONS_FAKTOR = .25; // check reduction factor gem. Martin 25% vom ursprünglichen Wert
-    public static final double RUNDUNGS_GENAUIGKEIT = 2;
+    public static final double REDUKTIONS_FAKTOR = .25; // check reduction factor -> gem. Martin 25% vom ursprünglichen Wert
+    public static final double RUNDUNGS_GENAUIGKEIT = 0.10;
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     private String mName;
@@ -35,7 +35,7 @@ public class Ware {
         System.out.print("Preis vor Reduktion : " + String.format("%.2f", lReduktion));
         lReduktion *= REDUKTIONS_FAKTOR;
         
-        lReduktion = HelperClasses.rundeAufZehner(lReduktion, 0.10);
+        lReduktion = HelperClasses.rundeAufZehner(lReduktion, RUNDUNGS_GENAUIGKEIT);
         int lPreisReduziert = HelperClasses.konvertiereInGanzzahl(lReduktion);
         System.out.println(" Preis für reduzierte Ware " + String.format("%.2f", lReduktion));
         return lPreisReduziert;  
