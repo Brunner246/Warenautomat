@@ -31,12 +31,12 @@ public class Ware {
         if (isHaltbarkeitUeberschritten() == false){
             return this.mPreis;
         }
-        double lReduktion = HelperClasses.konvertiereInDouble(this.mPreis);
+        double lReduktion = UnitKonverter.konvertiereInDouble(this.mPreis);
         System.out.print("Preis vor Reduktion : " + String.format("%.2f", lReduktion));
         lReduktion *= REDUKTIONS_FAKTOR;
         
-        lReduktion = HelperClasses.rundeAufZehner(lReduktion, RUNDUNGS_GENAUIGKEIT);
-        int lPreisReduziert = HelperClasses.konvertiereInGanzzahl(lReduktion);
+        lReduktion = UnitKonverter.rundeAufZehner(lReduktion, RUNDUNGS_GENAUIGKEIT);
+        int lPreisReduziert = UnitKonverter.konvertiereInGanzzahl(lReduktion);
         System.out.println(" Preis für reduzierte Ware " + String.format("%.2f", lReduktion));
         return lPreisReduziert;  
     }

@@ -68,7 +68,7 @@ public class Kasse {
    *         Wenn ein nicht unterstützter Münzbetrag übergeben wurde: -200
    */
   public int verwalteMuenzbestand(double aMuenzenBetrag, int aAnzahl) {
-    int lMuenzBetrag = HelperClasses.konvertiereInGanzzahl(aMuenzenBetrag);
+    int lMuenzBetrag = UnitKonverter.konvertiereInGanzzahl(aMuenzenBetrag);
     boolean lVal = contains(MUENZ_TYPEN, lMuenzBetrag);
       if (!lVal){
         return -200;
@@ -125,7 +125,7 @@ public class Kasse {
    *         <code> false </code>, wenn Münzsäule bereits voll war.
    */
   public boolean einnehmen(double pMuenzenBetrag) {
-    int lBetragRappen = HelperClasses.konvertiereInGanzzahl(pMuenzenBetrag);
+    int lBetragRappen = UnitKonverter.konvertiereInGanzzahl(pMuenzenBetrag);
     for (int il = 0; il < MUENZ_TYPEN.length; il++){
       if (MUENZ_TYPEN[il] == lBetragRappen){
         if (mMuenzsaeulen[il].freierPlatz() <= 0){
@@ -138,7 +138,7 @@ public class Kasse {
     }
     this.mGuthabenKunde += lBetragRappen;
     this.mWechselgeld = this.mGuthabenKunde;
-    SystemSoftware.zeigeBetragAn(HelperClasses.konvertiereInDouble(this.mWechselgeld));
+    SystemSoftware.zeigeBetragAn(UnitKonverter.konvertiereInDouble(this.mWechselgeld));
     return true;
   }
 
@@ -158,7 +158,7 @@ public class Kasse {
    * Bewirkt den Auswurf des Restbetrages.
    */
   public void gibWechselGeld() {
-    SystemSoftware.auswerfenWechselGeld(HelperClasses.konvertiereInDouble(this.mGuthabenKunde));
+    SystemSoftware.auswerfenWechselGeld(UnitKonverter.konvertiereInDouble(this.mGuthabenKunde));
 
     while (this.mGuthabenKunde != 0){
       if (this.mGuthabenKunde >= 200){
@@ -191,7 +191,7 @@ public class Kasse {
   public void kaufAusfuehren(Ware aWare){
     this.mGuthabenKunde -= aWare.getPreis();
     this.mPreisTotalVerkaufteWare += aWare.getPreis();
-    SystemSoftware.zeigeBetragAn(HelperClasses.konvertiereInDouble(this.mGuthabenKunde));
+    SystemSoftware.zeigeBetragAn(UnitKonverter.konvertiereInDouble(this.mGuthabenKunde));
   }
 
   /**
@@ -201,6 +201,6 @@ public class Kasse {
    * @return Gesamtbetrag der bisher verkauften Waren.
    */
   public double gibBetragVerkaufteWaren() {
-    return HelperClasses.konvertiereInDouble( this.mPreisTotalVerkaufteWare);
+    return UnitKonverter.konvertiereInDouble( this.mPreisTotalVerkaufteWare);
   }
 }

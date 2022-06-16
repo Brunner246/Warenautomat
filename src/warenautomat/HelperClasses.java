@@ -1,6 +1,6 @@
 package warenautomat;
 
-class HelperClasses {
+class UnitKonverter {
 
     public static int konvertiereInGanzzahl(double aMuenzbetrag){
         return (int) Math.round(aMuenzbetrag * 100);

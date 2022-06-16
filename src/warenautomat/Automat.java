@@ -18,7 +18,6 @@ public class Automat {
   private Kasse kasse;
   private ArrayList<Kauf> mVerkaufteWare = new ArrayList<Kauf>();
   private ArrayList<BestellungsKonfiguration> mBestellGrenze = new ArrayList<BestellungsKonfiguration>();
-  // private double mTotalerWarenWert = 0.;
   private boolean mServiceMode = false;
   /**
    * Der Standard-Konstruktor. <br>
@@ -58,7 +57,7 @@ public class Automat {
     if (this.getDrehteller(pDrehtellerNr).getAktuellesFach().istLeer()){
 			lDrehteller.setAktuellesFach(lDrehteller.getFachNr());
     }
-		int lPreis = HelperClasses.konvertiereInGanzzahl(pPreis);
+		int lPreis = UnitKonverter.konvertiereInGanzzahl(pPreis);
     Ware lNeueWare = new Ware(pWarenName, lPreis, pVerfallsDatum);
     SystemSoftware.zeigeWareInGui(pDrehtellerNr, pWarenName, pVerfallsDatum);
 		lDrehteller.fuelleFach(lNeueWare);
@@ -104,7 +103,7 @@ public class Automat {
 				SystemSoftware.zeigeVerfallsDatum(lDrehtellerNr, 0);
 			}
 			else{
-				SystemSoftware.zeigeWarenPreisAn(lDrehtellerNr, HelperClasses.konvertiereInDouble(lWare.getPreis()));
+				SystemSoftware.zeigeWarenPreisAn(lDrehtellerNr, UnitKonverter.konvertiereInDouble(lWare.getPreis()));
 				SystemSoftware.zeigeVerfallsDatum(lDrehtellerNr, lWare.getZustandDisplay());
         if (lWare.getPreis() > kasse.getGuthabenKunde()){
           SystemSoftware.zeigeZuWenigGeldAn();
@@ -243,7 +242,7 @@ public class Automat {
       lTotalerWarenWert += lDrehteller.getTotalWarenWert();
     }
     // this.mTotalerWarenWert += lTotalerWarenWert;
-    return HelperClasses.konvertiereInDouble(lTotalerWarenWert);    
+    return UnitKonverter.konvertiereInDouble(lTotalerWarenWert);    
   }
 
   /**
@@ -278,7 +277,7 @@ public class Automat {
         }
         if (lFach.getWare().getPreis() != aWare.getPreis()){
           lFach.getWare().setPreis(aWare.getPreis());
-          SystemSoftware.zeigeWarenPreisAn(lDrehteller.getFachNr(), HelperClasses.konvertiereInDouble(lFach.getWare().getPreis()));
+          SystemSoftware.zeigeWarenPreisAn(lDrehteller.getFachNr(), UnitKonverter.konvertiereInDouble(lFach.getWare().getPreis()));
         }
         continue;
       }
