@@ -30,14 +30,21 @@ public class GuiTest {
     Kasse kasse = automat.gibKasse();
     
     SystemSoftware.erzeugeGUI(automat);
-    
+        
     automat.neueWareVonBarcodeLeser(1, "Mars", 2.00, 
                                     LocalDate.parse("01.01.2009", FORMATTER));
     
     for(int i = 0; i < 16; i++) {
       String day = String.format("%02d", i+1);
-      automat.neueWareVonBarcodeLeser(1, "Mars"+(i+1), i+1, 
+      automat.neueWareVonBarcodeLeser(1, "Mars"+(i+1), i+1., 
                                       LocalDate.parse(day+".01.2100", FORMATTER));
+      automat.drehen();
+    }
+
+    for(int i = 0; i < 16; i++) {
+      String day = String.format("%02d", i+1);
+      automat.neueWareVonBarcodeLeser(2, "Twix"+(i+1), i+1., 
+                                      LocalDate.parse(day+".01.2000", FORMATTER));
       automat.drehen();
     }
     
