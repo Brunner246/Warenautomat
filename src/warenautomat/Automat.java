@@ -17,7 +17,9 @@ public class Automat {
   private Drehteller[] drehteller;
   private Kasse kasse;
   private ArrayList<Kauf> mVerkaufteWare = new ArrayList<Kauf>();
-  private double mTotalerWarenWert = 0.;
+  private ArrayList<BestellungsKonfiguration> mBestellGrenze = new ArrayList<BestellungsKonfiguration>();
+  // private double mTotalerWarenWert = 0.;
+  private boolean mServiceMode = false;
   /**
    * Der Standard-Konstruktor. <br>
    * Führt die nötigen Initialisierungen durch (u.a. wird darin die Kasse
@@ -49,7 +51,8 @@ public class Automat {
    * @param pVerfallsDatum Das Verfallsdatum der neuen Ware.
    */
   public void neueWareVonBarcodeLeser(int pDrehtellerNr, String pWarenName, double pPreis, LocalDate pVerfallsDatum) {
-		SystemSoftware.zeigeWarenPreisAn(pDrehtellerNr, pPreis);
+		this.mServiceMode = true;
+    SystemSoftware.zeigeWarenPreisAn(pDrehtellerNr, pPreis);
 		Drehteller lDrehteller = getDrehteller(pDrehtellerNr);
     // prüfen, ob Fach leer ist
     if (this.getDrehteller(pDrehtellerNr).getAktuellesFach().istLeer()){
@@ -59,9 +62,11 @@ public class Automat {
     Ware lNeueWare = new Ware(pWarenName, lPreis, pVerfallsDatum);
     SystemSoftware.zeigeWareInGui(pDrehtellerNr, pWarenName, pVerfallsDatum);
 		lDrehteller.fuelleFach(lNeueWare);
-    lPreis = lNeueWare.getPreis();
-    mTotalerWarenWert += HelperClasses.konvertiereInDouble(lPreis);
+    // prüfe, ob sich Preis verändert hat, wenn ja -> Preise anpassen
+    updateWarenPreis(lNeueWare);
+    //SystemSoftware.zeigeWarenPreisAn(lDrehteller.getFachNr(), HelperClasses.konvertiereInDouble(lNeueWare.getPreis()));
     kasse.anzeigenSetzen(); // zeige Display
+    this.mServiceMode = false;
 		return;
   }
 
@@ -133,31 +138,35 @@ public class Automat {
    */
   public boolean oeffnen(int aDrehtellerNr) {
 		Fach lFach = getDrehteller(aDrehtellerNr).getAktuellesFach();
+    System.out.println("Drehteller Nr. " + aDrehtellerNr + " Fach Nr. " + getDrehteller(aDrehtellerNr).getFachNr());
+    Ware lWare = lFach.getWare();
     if (lFach.istLeer()){
+      System.out.println("Drehteller Nr. " + aDrehtellerNr + " ist leer!");
 			return false;
 		}
 		else if (lFach.getWare().isHaltbarkeitUeberschritten()){
 			SystemSoftware.zeigeVerfallsDatum(aDrehtellerNr, 2);
 			System.out.print("Preis wurde reduziert...\n");
 		}
-    if (kasse.getGuthabenKunde() < lFach.getWare().getPreis()){
+    if (kasse.getGuthabenKunde() < lWare.getPreis()){
       SystemSoftware.zeigeZuWenigGeldAn();
       return false;
     }
-    int lRueckGeld = (kasse.getGuthabenKunde() - lFach.getWare().getPreis());
+    int lRueckGeld = (kasse.getGuthabenKunde() - lWare.getPreis());
     if (lRueckGeld > 0){
       if (!pruefeRueckGeldMenge(lRueckGeld)){
         SystemSoftware.zeigeZuWenigWechselGeldAn();
         return false;
       }
     }
-    kasse.kaufAusfuehren(lFach.getWare());
-    Kauf lKauf = new Kauf(lFach.getWare());
+    kasse.kaufAusfuehren(lWare);
+    Kauf lKauf = new Kauf(lWare);
     mVerkaufteWare.add(lKauf);
     SystemSoftware.entriegeln(aDrehtellerNr);
     lFach.setWare(null);
+    SystemSoftware.zeigeWareInGui(aDrehtellerNr, " ", null);
     SystemSoftware.zeigeVerfallsDatum(aDrehtellerNr, 0);
-
+    checkNachbestellung(lWare.getName());
     return true; 
   }
 
@@ -183,31 +192,33 @@ public class Automat {
         else if (kasse.getMuenzSaeule(il).getMuenzTyp() == 200){
           linMuenzSaeule200 += kasse.getMuenzSaeule(il).getAnzahlMuenzen() * kasse.getMuenzSaeule(il).getMuenzTyp();
         }
-       
         }
+      if (this.mServiceMode){
+        this.mServiceMode = false;
+      }
       while (aRueckgeld != 0){
         if (aRueckgeld >= 200 && linMuenzSaeule200 != 0){
-          kasse.getMuenzSaeule(4).neueMuenzen(-1, false);
+          kasse.getMuenzSaeule(4).neueMuenzen(-1, this.mServiceMode);
           aRueckgeld -= 200;
           SystemSoftware.auswerfenWechselGeld(2.00);
         }
         else if (aRueckgeld >= 100 && linMuenzSaeule100 != 0){
-          kasse.getMuenzSaeule(3).neueMuenzen(-1, false);
+          kasse.getMuenzSaeule(3).neueMuenzen(-1, this.mServiceMode);
           aRueckgeld -= 100;
           SystemSoftware.auswerfenWechselGeld(1.00);
         }
         else if (aRueckgeld >= 50 && linMuenzSaeule50 != 0){
-          kasse.getMuenzSaeule(2).neueMuenzen(-1, false);
+          kasse.getMuenzSaeule(2).neueMuenzen(-1, this.mServiceMode);
           aRueckgeld -= 50;
           SystemSoftware.auswerfenWechselGeld(0.50);
         }
         else if (aRueckgeld >= 20 && linMuenzSaeule20 != 0){
-          kasse.getMuenzSaeule(1).neueMuenzen(-1, false);
+          kasse.getMuenzSaeule(1).neueMuenzen(-1, this.mServiceMode);
           aRueckgeld -= 20;
           SystemSoftware.auswerfenWechselGeld(0.20);
         }
         else if (aRueckgeld >= 10 && linMuenzSaeule10 != 0){
-          kasse.getMuenzSaeule(0).neueMuenzen(-1, false);
+          kasse.getMuenzSaeule(0).neueMuenzen(-1, this.mServiceMode);
           aRueckgeld -= 10;
           SystemSoftware.auswerfenWechselGeld(0.10);
         }
@@ -227,8 +238,12 @@ public class Automat {
    * @return Der totale Warenwert des Automaten.
    */
   public double gibTotalenWarenWert() {
-    return mTotalerWarenWert; 
-    
+    int lTotalerWarenWert = 0;
+    for (Drehteller lDrehteller : drehteller){
+      lTotalerWarenWert += lDrehteller.getTotalWarenWert();
+    }
+    // this.mTotalerWarenWert += lTotalerWarenWert;
+    return HelperClasses.konvertiereInDouble(lTotalerWarenWert);    
   }
 
   /**
@@ -240,14 +255,93 @@ public class Automat {
    * @return Anzahl verkaufter Waren.
    */
   public int gibVerkaufsStatistik(String pName, LocalDate pDatum) {
-    int lCounter = 0; //TODO
+    int lCounter = 0;
     for (int il = 0; il < mVerkaufteWare.size(); il++){
       Kauf lK = mVerkaufteWare.get(il);
-      if (lK.getDate().isAfter(pDatum) && lK.getWare().getName().equals(pName)){
-        lCounter++;
+      if (lK != null){
+        if (lK.getDate().isAfter(pDatum) && lK.getWare().getName().equalsIgnoreCase(pName)){
+          lCounter++;
+        }
       }
     }
     return lCounter; 
   }
-  
+
+   /**
+    * Führt ein Update durch, wenn sich der Preis eines Produkts ändert. 
+   */
+  private void updateWarenPreis(Ware aWare){
+    for (Drehteller lDrehteller : drehteller){
+      for (Fach lFach : lDrehteller.getFaecher()){
+        if (lFach.getWare() == null || lFach.getWare().isHaltbarkeitUeberschritten()){
+          return;
+        }
+        if (lFach.getWare().getPreis() != aWare.getPreis()){
+          lFach.getWare().setPreis(aWare.getPreis());
+          SystemSoftware.zeigeWarenPreisAn(lDrehteller.getFachNr(), HelperClasses.konvertiereInDouble(lFach.getWare().getPreis()));
+        }
+        continue;
+      }
+    }
+    return;
+  }
+
+   /**
+   * Konfiguration einer automatischen Bestellung. <br>
+   * Der Automat setzt automatisch Bestellungen ab mittels
+   * <code> SystemSoftware.bestellen() </code> wenn eine Ware ausgeht.
+   * 
+   * @param pWarenName
+   *          Warenname derjenigen Ware, für welche eine automatische 
+   *          Bestellung konfiguriert wird.
+   * @param pGrenze
+   *          Ab welcher Anzahl von verkaufbarer Ware jeweils eine 
+   *          Bestellung abgesetzt werden soll.
+   * @param pAnzahlBestellung
+   *          Wieviele neue Waren jeweils bestellt werden sollen.
+   */
+  public void konfiguriereBestellung(String aWarenName, int aGrenze, int aAnzahlBestellung) {
+    BestellungsKonfiguration lBestellKonfig = new BestellungsKonfiguration(aWarenName,
+                                                                             aGrenze, aAnzahlBestellung);
+    this.mBestellGrenze.add(lBestellKonfig);
+  }
+
+  private int getTotalWarenMenge(String aWarenName){
+    int lMenge = 0;
+    for (Drehteller lDrehteller : drehteller){
+      lMenge += lDrehteller.getTotalWarenMenge(aWarenName);
+    }
+    return lMenge;
+  }
+
+  private boolean checkGrenzeErreicht(String aWarenName){
+    int lMenge = getTotalWarenMenge(aWarenName);
+    for (BestellungsKonfiguration lKonfig : this.mBestellGrenze){
+      if (aWarenName.equalsIgnoreCase(lKonfig.getWarenName())){
+        return lKonfig.getGrenze() >= lMenge;
+      }
+      return false; // ware nicht vorhanden
+    }
+    return false;
+  }
+
+  private BestellungsKonfiguration getObjektBeiName(String aWarenName){
+    for (BestellungsKonfiguration lKonfig : this.mBestellGrenze){
+      if (aWarenName.equalsIgnoreCase(lKonfig.getWarenName())){
+        return lKonfig;
+      }
+      return null;
+    }
+    return null;
+  }
+
+  private void checkNachbestellung(String aWarenName){
+    if (!checkGrenzeErreicht(aWarenName)){
+      return;
+    }
+    String lWarenName = getObjektBeiName(aWarenName).getWarenName();
+    int lAnzahlBestellung = getObjektBeiName(aWarenName).getAnzahlBestellung();
+    int lAnzahlVorhanden = getTotalWarenMenge(aWarenName);
+    SystemSoftware.bestellen(lWarenName, lAnzahlBestellung, lAnzahlVorhanden);
+  }
 }

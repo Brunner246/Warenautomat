@@ -3,7 +3,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class Ware {
-    public static final double REDUKTIONS_FAKTOR = .75; // TODO check reduction factor !!
+    public static final double REDUKTIONS_FAKTOR = .25; // check reduction factor gem. Martin 25% vom ursprünglichen Wert
     public static final double RUNDUNGS_GENAUIGKEIT = 2;
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
@@ -31,10 +31,14 @@ public class Ware {
         if (isHaltbarkeitUeberschritten() == false){
             return this.mPreis;
         }
-        System.out.println("Preis für reduzierte Ware");
         double lReduktion = HelperClasses.konvertiereInDouble(this.mPreis);
+        System.out.print("Preis vor Reduktion : " + String.format("%.2f", lReduktion));
         lReduktion *= REDUKTIONS_FAKTOR;
-        return HelperClasses.konvertiereInGanzzahl(lReduktion);  
+        
+        lReduktion = HelperClasses.rundeAufZehner(lReduktion, 0.10);
+        int lPreisReduziert = HelperClasses.konvertiereInGanzzahl(lReduktion);
+        System.out.println(" Preis für reduzierte Ware " + String.format("%.2f", lReduktion));
+        return lPreisReduziert;  
     }
 
     public LocalDate getDate(){
@@ -67,4 +71,9 @@ public class Ware {
     public Kauf getKauf(){
         return this.mKauf;
     }
+
+    public void setPreis(int aPreis){
+        this.mPreis = aPreis;
+    }
+
 }

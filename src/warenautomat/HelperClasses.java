@@ -9,6 +9,9 @@ class HelperClasses {
         double lBetrag = aBetrag / 100.;
         return  lBetrag;
     }
+    public static double rundeAufZehner(double aValue, double aRoundingScale) {
+        return aRoundingScale * Math.round(aValue / aRoundingScale);
+      }
 }
 
 class Muenztyp{
