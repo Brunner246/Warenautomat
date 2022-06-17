@@ -203,7 +203,4 @@ public class Kasse {
   public double gibBetragVerkaufteWaren() {
     return UnitKonverter.konvertiereInDouble( this.mPreisTotalVerkaufteWare);
   }
-  public Automat getAutomat(){
-    return this.mAutomat;
-  }
 }
